@@ -10,7 +10,7 @@ A Tampermonkey userscript that automatically summarizes YouTube videos and displ
 - Error handling and loading animations
 
 ## Installation
-1. Install the Tampermonkey extension in your browser.
+1. Install [Tampermonkey](https://www.tampermonkey.net/) in your browser.
 2. Add the script to Tampermonkey.
 3. Set your Mistral API key via the menu (`🔑 Set Mistral API Key`).
 
