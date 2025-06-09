@@ -22,3 +22,5 @@ A Tampermonkey userscript that automatically summarizes YouTube videos and displ
 ## Requirements
 - Tampermonkey extension
 - Mistral AI API key
+
+<img src="https://github.com/user-attachments/assets/3df3efc1-b25e-4161-a915-eaa8a837dd00" style="width:30%;" />
