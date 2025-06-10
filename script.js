@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.4
 // @description  YouTube videosunu Mistral AI ile otomatik özetler ve özeti şık, formatlı bir panelde gösterir.
-// @author       emrxxxx (Geliştiren: AI Assistant)
+// @author       emrxxxx
 // @match        *://www.youtube.com/watch*
 // @grant        GM_registerMenuCommand
 // @grant        GM_getValue
@@ -26,7 +26,7 @@
     }
 
     const CONFIG = {
-        API_MODEL: 'mistral-small-latest',
+        API_MODEL: 'codestral-latest',
         API_KEY_STORAGE: 'mistral_api_key',
         PANEL_CACHE_KEY_PREFIX: 'yt_summary_cache_',
     };
