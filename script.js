@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         YouTube Video Özetleyici (Kararlı Transkript)
+// @name         YouTube Video Özetleyici
 // @namespace    http://tampermonkey.net/
-// @version      1.4
-// @description  YouTube videosunu Mistral AI ile otomatik özetler ve özeti şık, formatlı bir panelde gösterir.
+// @version      1.5
+// @description  YouTube videosunu Mistral AI ile otomatik özetler ve özeti şık, formatlı bir panelde gösterir. Her tıklamada özet yeniden oluşturulur.
 // @author       emrxxxx
 // @match        *://www.youtube.com/watch*
 // @grant        GM_registerMenuCommand
@@ -28,7 +28,6 @@
     const CONFIG = {
         API_MODEL: 'codestral-latest',
         API_KEY_STORAGE: 'mistral_api_key',
-        PANEL_CACHE_KEY_PREFIX: 'yt_summary_cache_',
     };
 
     let apiKey = GM_getValue(CONFIG.API_KEY_STORAGE, '');
@@ -111,7 +110,7 @@
         title.style.cssText = 'margin: 0; font-size: 15px; font-weight: 500;';
         const closeBtn = document.createElement('button');
         closeBtn.textContent = '×';
-        closeBtn.style.cssText = `background: none; border: none; color: white; font-size: 20px; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; line-height: 1; padding: 0 4px;`;
+        closeBtn.style.cssText = `background: none; border: none; color: white; font-size: 20px; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; lineHeight: 1; padding: 0 4px;`;
         closeBtn.addEventListener('click', hideSummaryPanel);
         header.append(title, closeBtn);
 
@@ -151,18 +150,16 @@
         }
     }
 
-    // --- YENİ VE GELİŞTİRİLMİŞ TRANSKRİPT ALMA FONKSİYONU ---
     async function getYouTubeTranscript() {
         console.log("Transkript alınmaya çalışılıyor...");
         let transcriptOpened = false;
 
-        // YÖNTEM 1: "Diğer İşlemler" (üç nokta) menüsü üzerinden deneme
         try {
             console.log("Deneme 1: Menü butonu üzerinden transkript açılıyor...");
             const menuButton = document.querySelector('#button-shape > button[aria-label="Diğer işlemler"]');
             if (menuButton) {
                 menuButton.click();
-                await new Promise(r => setTimeout(r, 500)); // Menünün açılmasını bekle
+                await new Promise(r => setTimeout(r, 500));
                 const transcriptMenuItem = Array.from(document.querySelectorAll('ytd-menu-service-item-renderer, tp-yt-paper-item'))
                                                 .find(el => el.innerText.includes('Transkripti göster'));
                 if (transcriptMenuItem) {
@@ -175,7 +172,6 @@
             console.warn("Deneme 1 sırasında bir hata oluştu:", e);
         }
 
-        // YÖNTEM 2: Yöntem 1 başarısız olursa, açıklama alanı üzerinden deneme
         if (!transcriptOpened) {
             try {
                 console.log("Deneme 1 başarısız. Deneme 2: Açıklama alanından transkript açılıyor...");
@@ -198,12 +194,11 @@
             throw new Error('"Transkripti göster" butonu hiçbir yöntemle bulunamadı. Bu video için transkript mevcut olmayabilir.');
         }
 
-        // Transkript panelinin yüklenmesini bekle ve veriyi çek
         const transcriptPanelSelector = 'ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-searchable-transcript"]';
         const transcriptSegmentSelector = 'yt-formatted-string.ytd-transcript-segment-renderer';
         let transcriptPanel;
 
-        for (let i = 0; i < 20; i++) { // Maksimum 10 saniye bekle
+        for (let i = 0; i < 20; i++) {
             transcriptPanel = document.querySelector(transcriptPanelSelector);
             if (transcriptPanel && transcriptPanel.querySelector(transcriptSegmentSelector)) {
                 break;
@@ -216,7 +211,6 @@
         const segments = transcriptPanel.querySelectorAll(transcriptSegmentSelector);
         const transcriptText = Array.from(segments).map(s => s.textContent.trim()).join(' ');
 
-        // Paneli kapat
         const closeButton = document.querySelector(`${transcriptPanelSelector} button[aria-label="Transkripti kapat"]`);
         if (closeButton) {
             closeButton.click();
@@ -227,7 +221,6 @@
         console.log("Transkript başarıyla alındı.");
         return transcriptText;
     }
-
 
     async function fetchSummaryFromAPI(transcript) {
         return new Promise((resolve, reject) => {
@@ -272,19 +265,9 @@
         updateSummaryPanel('Özet hazırlanıyor, lütfen bekleyin...', { isLoading: true });
 
         try {
-            const cacheKey = `${CONFIG.PANEL_CACHE_KEY_PREFIX}${videoId}`;
-            const cachedSummary = sessionStorage.getItem(cacheKey);
-            if (cachedSummary) {
-                console.log("Özet önbellekten yüklendi.");
-                updateSummaryPanel(cachedSummary);
-                return;
-            }
-
             const transcript = await getYouTubeTranscript();
             const summary = await fetchSummaryFromAPI(transcript);
             updateSummaryPanel(summary);
-            sessionStorage.setItem(cacheKey, summary);
-
         } catch (err) {
             console.error('Özetleme hatası:', err);
             updateSummaryPanel(`Hata: ${err.message}`, { isError: true });
