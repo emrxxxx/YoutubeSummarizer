@@ -276,8 +276,7 @@
                             content: `Summarize the YouTube video transcript below in Turkish in Markdown format:\n\n${transcript}`
                         }
                     ],
-                    temperature: 0.5,
-                    max_tokens: 600,
+                    temperature: 0.5
                 }),
                 onload: (response) => {
                     if (response.status >= 200 && response.status < 300) {
