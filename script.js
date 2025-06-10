@@ -20,9 +20,12 @@
     if (window.trustedTypes && window.trustedTypes.createPolicy) {
         try {
             window.trustedTypes.createPolicy('default', {
-                createHTML: (string) => DOMPurify.sanitize(string, { RETURN_TRUSTED_TYPE: true }),
+                createHTML: (string) => DOMPurify.sanitize(string, {
+                    RETURN_TRUSTED_TYPE: true
+                }),
             });
-        } catch (e) { /* Politika zaten varsa sorun değil */ }
+        } catch (e) {
+            /* Politika zaten varsa sorun değil */ }
     }
 
     const CONFIG = {
@@ -50,15 +53,38 @@
         btn.textContent = '📝';
         btn.title = 'Videoyu Özetle (Ctrl+Shift+S)';
         Object.assign(btn.style, {
-            position: 'fixed', bottom: '30px', right: '30px', width: '40px', height: '40px',
-            borderRadius: '50%', border: 'none', background: '#2a2a2a', color: 'white',
-            fontSize: '16px', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
-            zIndex: '10000', transition: 'all 0.3s ease', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', opacity: '0.9', padding: '0', lineHeight: '1',
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            border: 'none',
+            background: '#2a2a2a',
+            color: 'white',
+            fontSize: '16px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+            zIndex: '10000',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: '0.9',
+            padding: '0',
+            lineHeight: '1',
         });
 
-        btn.addEventListener('mouseover', () => { btn.style.background = '#ff3333'; btn.style.transform = 'scale(1.1) rotate(5deg)'; btn.style.opacity = '1'; });
-        btn.addEventListener('mouseout', () => { btn.style.background = '#2a2a2a'; btn.style.transform = 'scale(1) rotate(0deg)'; btn.style.opacity = '0.9'; });
+        btn.addEventListener('mouseover', () => {
+            btn.style.background = '#ff3333';
+            btn.style.transform = 'scale(1.1) rotate(5deg)';
+            btn.style.opacity = '1';
+        });
+        btn.addEventListener('mouseout', () => {
+            btn.style.background = '#2a2a2a';
+            btn.style.transform = 'scale(1) rotate(0deg)';
+            btn.style.opacity = '0.9';
+        });
         btn.addEventListener('click', handleSummarizeClick);
 
         document.body.appendChild(btn);
@@ -128,7 +154,10 @@
 
     function showSummaryPanel() {
         if (!summaryPanel) createSummaryPanel();
-        requestAnimationFrame(() => { summaryPanel.style.transform = 'translateX(0)'; summaryPanel.style.opacity = '1'; });
+        requestAnimationFrame(() => {
+            summaryPanel.style.transform = 'translateX(0)';
+            summaryPanel.style.opacity = '1';
+        });
     }
 
     function hideSummaryPanel() {
@@ -137,7 +166,10 @@
         summaryPanel.style.opacity = '0';
     }
 
-    function updateSummaryPanel(content, { isError = false, isLoading = false } = {}) {
+    function updateSummaryPanel(content, {
+        isError = false,
+        isLoading = false
+    } = {}) {
         const panelContent = document.getElementById('summary-content');
         if (!panelContent) return;
         panelContent.style.color = isError ? '#ff6b6b' : 'inherit';
@@ -145,7 +177,9 @@
             panelContent.textContent = content;
         } else {
             const dirtyHtml = marked.parse(content);
-            const cleanHtml = DOMPurify.sanitize(dirtyHtml, { RETURN_TRUSTED_TYPE: true });
+            const cleanHtml = DOMPurify.sanitize(dirtyHtml, {
+                RETURN_TRUSTED_TYPE: true
+            });
             panelContent.innerHTML = cleanHtml;
         }
     }
@@ -161,7 +195,7 @@
                 menuButton.click();
                 await new Promise(r => setTimeout(r, 500));
                 const transcriptMenuItem = Array.from(document.querySelectorAll('ytd-menu-service-item-renderer, tp-yt-paper-item'))
-                                                .find(el => el.innerText.includes('Transkripti göster'));
+                    .find(el => el.innerText.includes('Transkripti göster'));
                 if (transcriptMenuItem) {
                     transcriptMenuItem.click();
                     transcriptOpened = true;
@@ -179,7 +213,7 @@
                 if (descriptionExpander) descriptionExpander.click();
                 await new Promise(r => setTimeout(r, 500));
                 const transcriptButtonInDesc = Array.from(document.querySelectorAll('ytd-button-renderer, a.yt-simple-endpoint'))
-                                                    .find(el => el.innerText.trim().includes('Transkripti göster'));
+                    .find(el => el.innerText.trim().includes('Transkripti göster'));
                 if (transcriptButtonInDesc) {
                     transcriptButtonInDesc.click();
                     transcriptOpened = true;
@@ -227,14 +261,23 @@
             GM_xmlhttpRequest({
                 method: 'POST',
                 url: 'https://api.mistral.ai/v1/chat/completions',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
                 data: JSON.stringify({
                     model: CONFIG.API_MODEL,
-                    messages: [
-                        { role: 'system', content: `You are an expert assistant for summarizing YouTube videos. Your goal is to provide a clear, structured summary in Turkish using Markdown formatting. Use headings (###), bullet points (*), and bold text (**). Start with a one-sentence overview.` },
-                        { role: 'user', content: `Summarize the YouTube video transcript below in Turkish in Markdown format:\n\n${transcript}` }
+                    messages: [{
+                            role: 'system',
+                            content: `You are an expert assistant for summarizing YouTube videos. Your goal is to provide a clear, structured summary in Turkish using Markdown formatting. Use headings (###), bullet points (*), and bold text (**). Start with a one-sentence overview.`
+                        },
+                        {
+                            role: 'user',
+                            content: `Summarize the YouTube video transcript below in Turkish in Markdown format:\n\n${transcript}`
+                        }
                     ],
-                    temperature: 0.5, max_tokens: 600,
+                    temperature: 0.5,
+                    max_tokens: 600,
                 }),
                 onload: (response) => {
                     if (response.status >= 200 && response.status < 300) {
@@ -256,13 +299,23 @@
         const btn = document.getElementById('summary-btn');
         if (btn.classList.contains('loading')) return;
         const videoId = new URLSearchParams(window.location.search).get('v');
-        if (!videoId) { alert('Geçerli bir YouTube video sayfası değil.'); return; }
-        if (!apiKey) { alert('Lütfen menüden Mistral API anahtarınızı ayarlayın.'); return; }
+        if (!videoId) {
+            alert('Geçerli bir YouTube video sayfası değil.');
+            return;
+        }
+        if (!apiKey) {
+            alert('Lütfen menüden Mistral API anahtarınızı ayarlayın.');
+            return;
+        }
 
-        btn.textContent = '⏳'; btn.style.animation = 'spin 1s linear infinite'; btn.classList.add('loading');
+        btn.textContent = '⏳';
+        btn.style.animation = 'spin 1s linear infinite';
+        btn.classList.add('loading');
         createSummaryPanel();
         showSummaryPanel();
-        updateSummaryPanel('Özet hazırlanıyor, lütfen bekleyin...', { isLoading: true });
+        updateSummaryPanel('Özet hazırlanıyor, lütfen bekleyin...', {
+            isLoading: true
+        });
 
         try {
             const transcript = await getYouTubeTranscript();
@@ -270,35 +323,49 @@
             updateSummaryPanel(summary);
         } catch (err) {
             console.error('Özetleme hatası:', err);
-            updateSummaryPanel(`Hata: ${err.message}`, { isError: true });
+            updateSummaryPanel(`Hata: ${err.message}`, {
+                isError: true
+            });
         } finally {
-            btn.textContent = '📝'; btn.style.animation = ''; btn.classList.remove('loading');
+            btn.textContent = '📝';
+            btn.style.animation = '';
+            btn.classList.remove('loading');
         }
     }
 
     function makeDraggable(element, handle) {
-        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        let pos1 = 0,
+            pos2 = 0,
+            pos3 = 0,
+            pos4 = 0;
         handle.onmousedown = (e) => {
             e.preventDefault();
-            pos3 = e.clientX; pos4 = e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
             document.onmouseup = closeDragElement;
             document.onmousemove = elementDrag;
         };
+
         function elementDrag(e) {
             e.preventDefault();
-            pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
-            pos3 = e.clientX; pos4 = e.clientY;
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
             element.style.top = (element.offsetTop - pos2) + "px";
             element.style.left = (element.offsetLeft - pos1) + "px";
-            element.style.right = 'auto'; element.style.bottom = 'auto';
+            element.style.right = 'auto';
+            element.style.bottom = 'auto';
         }
+
         function closeDragElement() {
-            document.onmouseup = null; document.onmousemove = null;
+            document.onmouseup = null;
+            document.onmousemove = null;
         }
     }
 
     function initialize() {
-        if(document.getElementById('summary-btn')) return;
+        if (document.getElementById('summary-btn')) return;
         if (window.location.href.includes('/watch')) createButton();
     }
 
