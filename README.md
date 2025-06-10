@@ -24,3 +24,6 @@ A Tampermonkey userscript that automatically summarizes YouTube videos and displ
 - Mistral AI API key
 
 <img src="https://github.com/user-attachments/assets/c08c6d4f-d0bf-4163-93d4-4b2e0b744c2b" style="width:30%;" />
+
+---
+For some videos, YouTube's transcript panel may open the chapters or timeline by default. In this case, you may encounter the "transcript not available" error. To solve the problem, you need to select the speech text.
